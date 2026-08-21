@@ -1,15 +1,16 @@
-# Step 1: Build the Java application using Maven
+# Stage 1: Build JAR using Maven
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
+COPY mvnw .
+COPY .mvn .mvn
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Step 2: Run the application with lightweight Java runtime
-FROM eclipse-temurin-17-jre-alpine
+# Stage 2: Correct image tag syntax (colon instead of hyphen)
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-# Render assigns a dynamic PORT at runtime
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
