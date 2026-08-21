@@ -16,8 +16,7 @@ public class Inventory {
     private String category;
     private String brand;
 
-    @Lob
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String photo;
 
     private Integer setTotal = 0;
