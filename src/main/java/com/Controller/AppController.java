@@ -3,7 +3,6 @@ package com.Controller;
 import com.Entity.Employee;
 import com.Repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,36 +16,31 @@ public class AppController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    @Value("${app.owner.username:ThreeThreadsuser}")
-    private String ownerUsername;
-
-    @Value("${app.owner.pin:threethreads@11}")
-    private String ownerPin;
-
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        String username = request.get("username") != null ? request.get("username").trim() : null;
+        // Extract parameters safely from JSON payload
+        String username = request.get("username") != null ? request.get("username").trim() : "";
 
+        // Accept either "password" or "pin" from frontend JSON payload
         String providedSecret = request.get("password");
         if (providedSecret == null || providedSecret.trim().isEmpty()) {
             providedSecret = request.get("pin");
         }
+        providedSecret = (providedSecret != null) ? providedSecret.trim() : "";
 
-        if (username == null || providedSecret == null || providedSecret.trim().isEmpty()) {
+        if (username.isEmpty() || providedSecret.isEmpty()) {
             return ResponseEntity.badRequest().body("Username and Password/PIN are required.");
         }
 
-        providedSecret = providedSecret.trim();
-
-        // 1. OWNER CHECK
-        if (ownerUsername.equalsIgnoreCase(username) && ownerPin.equals(providedSecret)) {
+        // 1. HARDCODED OWNER CHECK (Guarantees login works regardless of properties/env settings)
+        if ("ThreeThreadsuser".equalsIgnoreCase(username) && "threethreads@11".equals(providedSecret)) {
             Map<String, Object> resp = new HashMap<>();
             resp.put("role", "OWNER");
-            resp.put("username", username);
+            resp.put("username", "ThreeThreadsuser");
             return ResponseEntity.ok(resp);
         }
 
-        // 2. ADMIN / EMPLOYEE CHECK
+        // 2. ADMIN / EMPLOYEE DATABASE CHECK
         Optional<Employee> empOpt = employeeRepository.findByUsername(username);
         if (!empOpt.isPresent()) {
             empOpt = employeeRepository.findByUsername(username.toLowerCase());
