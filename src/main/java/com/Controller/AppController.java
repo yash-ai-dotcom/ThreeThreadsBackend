@@ -38,15 +38,15 @@ public class AppController {
 
         providedSecret = providedSecret.trim();
 
-        // 1. DIRECT HARDCODED OWNER CHECK (Ignores external application configs completely)
-        if ("ThreeThreadsuser".equalsIgnoreCase(username) && "threethreads@11".equals(providedSecret)) {
+        // 1. OWNER CHECK
+        if (ownerUsername.equalsIgnoreCase(username) && ownerPin.equals(providedSecret)) {
             Map<String, Object> resp = new HashMap<>();
             resp.put("role", "OWNER");
-            resp.put("username", "ThreeThreadsuser");
+            resp.put("username", username);
             return ResponseEntity.ok(resp);
         }
 
-        // 2. ADMIN / EMPLOYEE DATABASE CHECK
+        // 2. ADMIN / EMPLOYEE CHECK
         Optional<Employee> empOpt = employeeRepository.findByUsername(username);
         if (!empOpt.isPresent()) {
             empOpt = employeeRepository.findByUsername(username.toLowerCase());
@@ -65,3 +65,4 @@ public class AppController {
 
         return ResponseEntity.status(401).body("Invalid username or password.");
     }
+}
