@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/employees")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*") // Fixes CORS blocking from Vercel
 public class EmployeeController {
 
     @Autowired
@@ -18,6 +18,9 @@ public class EmployeeController {
 
     @PostMapping
     public ResponseEntity<?> createEmployee(@RequestBody Employee employee) {
+        if (employee.getUsername() != null) {
+            employee.setUsername(employee.getUsername().trim().toLowerCase());
+        }
         if (employeeRepository.existsByUsername(employee.getUsername())) {
             return ResponseEntity.badRequest().body("Username is already taken.");
         }

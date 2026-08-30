@@ -11,7 +11,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*") // Allows request origins from Vercel & local env
+@CrossOrigin(origins = "*")
 public class AppController {
 
     @Autowired
@@ -27,7 +27,6 @@ public class AppController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String username = request.get("username") != null ? request.get("username").trim() : null;
 
-        // Accept either "password" (Owner) or "pin" (Employee) from frontend
         String providedSecret = request.get("password");
         if (providedSecret == null || providedSecret.trim().isEmpty()) {
             providedSecret = request.get("pin");
@@ -39,16 +38,20 @@ public class AppController {
 
         providedSecret = providedSecret.trim();
 
-        // 1. OWNER CHECK (Matches string password against hardcoded / application properties)
-        if (ownerUsername.equals(username) && ownerPin.equals(providedSecret)) {
+        // 1. OWNER CHECK (Case-insensitive username check)
+        if (ownerUsername.equalsIgnoreCase(username) && ownerPin.equals(providedSecret)) {
             Map<String, Object> resp = new HashMap<>();
             resp.put("role", "OWNER");
             resp.put("username", username);
             return ResponseEntity.ok(resp);
         }
 
-        // 2. ADMIN / EMPLOYEE CHECK (Matches stored PIN from database)
+        // 2. ADMIN / EMPLOYEE CHECK (Checks both exact case and lowercase fallback)
         Optional<Employee> empOpt = employeeRepository.findByUsername(username);
+        if (!empOpt.isPresent()) {
+            empOpt = employeeRepository.findByUsername(username.toLowerCase());
+        }
+
         if (empOpt.isPresent()) {
             Employee emp = empOpt.get();
             if (emp.getPin() != null && emp.getPin().trim().equals(providedSecret)) {
