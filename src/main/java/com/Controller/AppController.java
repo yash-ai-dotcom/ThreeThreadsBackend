@@ -11,7 +11,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*") // Allows requests from Vercel & local environments
+@CrossOrigin(origins = "*") // Allows request origins from Vercel & local env
 public class AppController {
 
     @Autowired
@@ -25,26 +25,33 @@ public class AppController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        String username = request.get("username");
-        String pin = request.get("pin");
+        String username = request.get("username") != null ? request.get("username").trim() : null;
 
-        if (username == null || pin == null) {
+        // Accept either "password" (Owner) or "pin" (Employee) from frontend
+        String providedSecret = request.get("password");
+        if (providedSecret == null || providedSecret.trim().isEmpty()) {
+            providedSecret = request.get("pin");
+        }
+
+        if (username == null || providedSecret == null || providedSecret.trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Username and Password/PIN are required.");
         }
 
-        // 1. OWNER CHECK (Uses dynamic properties with fallback)
-        if (ownerUsername.equals(username) && ownerPin.equals(pin)) {
+        providedSecret = providedSecret.trim();
+
+        // 1. OWNER CHECK (Matches string password against hardcoded / application properties)
+        if (ownerUsername.equals(username) && ownerPin.equals(providedSecret)) {
             Map<String, Object> resp = new HashMap<>();
             resp.put("role", "OWNER");
             resp.put("username", username);
             return ResponseEntity.ok(resp);
         }
 
-        // 2. ADMIN / STAFF CHECK (Database lookup from Employee table)
+        // 2. ADMIN / EMPLOYEE CHECK (Matches stored PIN from database)
         Optional<Employee> empOpt = employeeRepository.findByUsername(username);
         if (empOpt.isPresent()) {
             Employee emp = empOpt.get();
-            if (emp.getPin().equals(pin)) {
+            if (emp.getPin() != null && emp.getPin().trim().equals(providedSecret)) {
                 Map<String, Object> resp = new HashMap<>();
                 resp.put("role", emp.getRole());
                 resp.put("username", emp.getUsername());
