@@ -38,15 +38,15 @@ public class AppController {
 
         providedSecret = providedSecret.trim();
 
-        // 1. OWNER CHECK (Case-insensitive username check)
-        if (ownerUsername.equalsIgnoreCase(username) && ownerPin.equals(providedSecret)) {
+        // 1. DIRECT HARDCODED OWNER CHECK (Ignores external application configs completely)
+        if ("ThreeThreadsuser".equalsIgnoreCase(username) && "threethreads@11".equals(providedSecret)) {
             Map<String, Object> resp = new HashMap<>();
             resp.put("role", "OWNER");
-            resp.put("username", username);
+            resp.put("username", "ThreeThreadsuser");
             return ResponseEntity.ok(resp);
         }
 
-        // 2. ADMIN / EMPLOYEE CHECK (Checks both exact case and lowercase fallback)
+        // 2. ADMIN / EMPLOYEE DATABASE CHECK
         Optional<Employee> empOpt = employeeRepository.findByUsername(username);
         if (!empOpt.isPresent()) {
             empOpt = employeeRepository.findByUsername(username.toLowerCase());
@@ -63,6 +63,5 @@ public class AppController {
             }
         }
 
-        return ResponseEntity.status(401).body("Invalid Username or Password/PIN.");
+        return ResponseEntity.status(401).body("Invalid username or password.");
     }
-}
