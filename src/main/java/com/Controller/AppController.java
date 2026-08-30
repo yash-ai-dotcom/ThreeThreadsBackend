@@ -18,10 +18,7 @@ public class AppController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        // Extract parameters safely from JSON payload
         String username = request.get("username") != null ? request.get("username").trim() : "";
-
-        // Accept either "password" or "pin" from frontend JSON payload
         String providedSecret = request.get("password");
         if (providedSecret == null || providedSecret.trim().isEmpty()) {
             providedSecret = request.get("pin");
@@ -32,7 +29,7 @@ public class AppController {
             return ResponseEntity.badRequest().body("Username and Password/PIN are required.");
         }
 
-        // 1. HARDCODED OWNER CHECK (Guarantees login works regardless of properties/env settings)
+        // 1. OWNER LOGIN CHECK
         if ("ThreeThreadsuser".equalsIgnoreCase(username) && "threethreads@11".equals(providedSecret)) {
             Map<String, Object> resp = new HashMap<>();
             resp.put("role", "OWNER");
@@ -40,7 +37,7 @@ public class AppController {
             return ResponseEntity.ok(resp);
         }
 
-        // 2. ADMIN / EMPLOYEE DATABASE CHECK
+        // 2. DATABASE EMPLOYEE LOOKUP (Case-Insensitive)
         Optional<Employee> empOpt = employeeRepository.findByUsername(username);
         if (!empOpt.isPresent()) {
             empOpt = employeeRepository.findByUsername(username.toLowerCase());
@@ -48,9 +45,12 @@ public class AppController {
 
         if (empOpt.isPresent()) {
             Employee emp = empOpt.get();
-            if (emp.getPin() != null && emp.getPin().trim().equals(providedSecret)) {
+            // Check against both getPin() and getPassword() if both exist in Entity
+            String storedPin = emp.getPin() != null ? emp.getPin().trim() : "";
+
+            if (!storedPin.isEmpty() && storedPin.equals(providedSecret)) {
                 Map<String, Object> resp = new HashMap<>();
-                resp.put("role", emp.getRole());
+                resp.put("role", emp.getRole() != null ? emp.getRole() : "ADMIN");
                 resp.put("username", emp.getUsername());
                 resp.put("fullName", emp.getFullName());
                 return ResponseEntity.ok(resp);
