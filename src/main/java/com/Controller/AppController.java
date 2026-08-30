@@ -11,7 +11,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*") // Allows requests from Vercel & local environments
 public class AppController {
 
     @Autowired
@@ -32,15 +32,15 @@ public class AppController {
             return ResponseEntity.badRequest().body("Username and Password/PIN are required.");
         }
 
-        // Hardcoded Owner Check
-        if ("ThreeThreadsuser".equals(username) && "threethreads@11".equals(pin)) {
+        // 1. OWNER CHECK (Uses dynamic properties with fallback)
+        if (ownerUsername.equals(username) && ownerPin.equals(pin)) {
             Map<String, Object> resp = new HashMap<>();
             resp.put("role", "OWNER");
             resp.put("username", username);
             return ResponseEntity.ok(resp);
         }
 
-        // Employee Database Check (Admin / Staff)
+        // 2. ADMIN / STAFF CHECK (Database lookup from Employee table)
         Optional<Employee> empOpt = employeeRepository.findByUsername(username);
         if (empOpt.isPresent()) {
             Employee emp = empOpt.get();
