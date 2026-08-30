@@ -1,4 +1,4 @@
-package com.threethreads.inventory.model;
+package com.Entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -11,17 +11,15 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Credentials & Authentication
     @Column(unique = true, nullable = false)
     private String username;
 
     @Column(nullable = false)
-    private String pin; // Stored as a BCrypt hash
+    private String pin;
 
     @Column(nullable = false)
-    private String role; // e.g., "ADMIN", "STAFF"
+    private String role;
 
-    // Personal Details
     @Column(nullable = false)
     private String fullName;
 
@@ -31,7 +29,6 @@ public class Employee {
     @Column(unique = true, nullable = false)
     private String aadhaarNo;
 
-    // Contact & Background
     @Column(nullable = false)
     private String mobileNo;
 
@@ -43,10 +40,10 @@ public class Employee {
 
     private String education;
 
-    // Constructors, Getters, and Setters
     public Employee() {}
 
     public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
     public String getPin() { return pin; }
