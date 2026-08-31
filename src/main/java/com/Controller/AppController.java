@@ -29,23 +29,19 @@ public class AppController {
             return ResponseEntity.badRequest().body("Username and Password/PIN are required.");
         }
 
-        // 1. OWNER LOGIN CHECK
-        if ("ThreeThreadsuser".equalsIgnoreCase(username) && "threethreads@11".equals(providedSecret)) {
+        // 1. OWNER LOGIN CHECK (Updated PIN: 705850)
+        if ("threethreadsuser".equalsIgnoreCase(username) && "705850".equals(providedSecret)) {
             Map<String, Object> resp = new HashMap<>();
             resp.put("role", "OWNER");
-            resp.put("username", "ThreeThreadsuser");
+            resp.put("username", "threethreadsuser");
             return ResponseEntity.ok(resp);
         }
 
-        // 2. DATABASE EMPLOYEE LOOKUP (Case-Insensitive)
-        Optional<Employee> empOpt = employeeRepository.findByUsername(username);
-        if (!empOpt.isPresent()) {
-            empOpt = employeeRepository.findByUsername(username.toLowerCase());
-        }
+        // 2. DATABASE EMPLOYEE LOOKUP
+        Optional<Employee> empOpt = employeeRepository.findByUsernameIgnoreCase(username);
 
         if (empOpt.isPresent()) {
             Employee emp = empOpt.get();
-            // Check against both getPin() and getPassword() if both exist in Entity
             String storedPin = emp.getPin() != null ? emp.getPin().trim() : "";
 
             if (!storedPin.isEmpty() && storedPin.equals(providedSecret)) {
