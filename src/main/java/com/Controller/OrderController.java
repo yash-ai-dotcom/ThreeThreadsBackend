@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
+@CrossOrigin(origins = "*") // Or specify your frontend URL e.g. "https://your-frontend.vercel.app"
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
