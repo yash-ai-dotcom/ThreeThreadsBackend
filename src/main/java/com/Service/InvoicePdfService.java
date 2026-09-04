@@ -1,7 +1,6 @@
 package com.Service;
 
 import com.Entity.Order;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -12,27 +11,28 @@ import java.io.ByteArrayOutputStream;
 @Service
 public class InvoicePdfService {
 
-    @Autowired
-    private TemplateEngine templateEngine;
+    private final TemplateEngine templateEngine;
+
+    public InvoicePdfService(TemplateEngine templateEngine) {
+        this.templateEngine = templateEngine;
+    }
 
     public byte[] generateOrderInvoicePdf(Order order) throws Exception {
         Context context = new Context();
-        context.setVariable("orderId", order.getId());
-        context.setVariable("customerName", order.getCustomerName());
-        context.setVariable("customerPhone", order.getCustomerPhone());
-        context.setVariable("shippingAddress", order.getShippingAddress());
-        context.setVariable("orderItems", order.getOrderItems());
-        context.setVariable("grandTotal", order.getGrandTotal());
-        context.setVariable("orderDate", order.getCreatedAt());
 
-        String renderedHtml = templateEngine.process("invoice-template", context);
+        // Pass order details to Thymeleaf template using matching entity getters
+        context.setVariable("order", order);
+        context.setVariable("items", order.getItems()); // Replaces getOrderItems()
+        context.setVariable("totalAmount", order.getTotalAmount()); // Replaces getGrandTotal()
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ITextRenderer renderer = new ITextRenderer();
-        renderer.setDocumentFromString(renderedHtml);
-        renderer.layout();
-        renderer.createPDF(outputStream);
+        String htmlContent = templateEngine.process("invoice-template", context);
 
-        return outputStream.toByteArray();
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(htmlContent);
+            renderer.layout();
+            renderer.createPDF(outputStream);
+            return outputStream.toByteArray();
+        }
     }
 }
