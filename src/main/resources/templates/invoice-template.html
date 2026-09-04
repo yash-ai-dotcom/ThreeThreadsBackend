@@ -21,7 +21,7 @@
 
 <div class="details">
     <p><strong>Billed To:</strong> <span th:text="${order?.customerName != null ? order.customerName : 'N/A'}">Customer</span></p>
-    <p><strong>Invoice ID:</strong> #INV-<span th:text="${order?.id != null ? order.id : '0'}">0</span></p>
+    <p><strong>Invoice No:</strong> <span th:text="${order?.invoiceNo != null ? order.invoiceNo : 'N/A'}">INV-0000</span></p>
     <p><strong>Status:</strong> <span th:text="${order?.status != null ? order.status : 'PENDING'}">PENDING</span></p>
     <p><strong>Grand Total:</strong> ₹<span th:text="${totalAmount != null ? totalAmount : 0}">0</span></p>
 </div>
@@ -31,16 +31,18 @@
     <tr>
         <th>ARTICLE NO</th>
         <th>COLOR</th>
-        <th>QUANTITY</th>
+        <th>TOTAL PCS</th>
+        <th>PRICE/PC</th>
         <th>TOTAL</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="item : ${items}">
         <td th:text="${item?.articleNo != null ? item.articleNo : 'N/A'}">ART-101</td>
-        <td th:text="${item?.color != null ? item.color : 'N/A'}">Black</td>
-        <td th:text="${item?.quantity != null ? item.quantity : 0}">1</td>
-        <td th:text="${item?.totalPrice != null ? '₹' + item.totalPrice : '₹0'}">₹0</td>
+        <td th:text="${item?.colorName != null ? item.colorName : 'N/A'}">Black</td>
+        <td th:text="${item?.totalPiecesOrdered != null ? item.totalPiecesOrdered : 0}">1</td>
+        <td th:text="${item?.pricePerPiece != null ? '₹' + item.pricePerPiece : '₹0'}">₹0</td>
+        <td th:text="${item?.itemTotal != null ? '₹' + item.itemTotal : '₹0'}">₹0</td>
     </tr>
     </tbody>
 </table>
