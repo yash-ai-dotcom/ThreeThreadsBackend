@@ -45,19 +45,21 @@ public class OrderController {
         try {
             Order order = orderService.getOrderById(id);
             if (order == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.notFound().build(); //[cite: 4]
             }
-            byte[] pdfBytes = invoicePdfService.generateOrderInvoicePdf(order);
+            byte[] pdfBytes = invoicePdfService.generateOrderInvoicePdf(order); //[cite: 4]
 
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentType(MediaType.APPLICATION_PDF); //[cite: 4]
             headers.setContentDisposition(
-                    ContentDisposition.attachment().filename("Invoice_Order_" + id + ".pdf").build()
+                    ContentDisposition.attachment().filename("Invoice_Order_" + id + ".pdf").build() //[cite: 4]
             );
 
-            return ResponseEntity.ok().headers(headers).body(pdfBytes);
+            return ResponseEntity.ok().headers(headers).body(pdfBytes); //[cite: 4]
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            // PRINT THE EXACT ERROR TO RENDER LOGS
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build(); //[cite: 4]
         }
     }
 

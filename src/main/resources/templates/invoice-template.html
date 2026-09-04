@@ -1,13 +1,15 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .header { margin-bottom: 20px; }
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+        .header { margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
         .company-name { font-size: 24px; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        .details { margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 14px; }
+        th { background-color: #f4f4f4; }
     </style>
 </head>
 <body>
@@ -17,12 +19,11 @@
     <p>Try it, wear it, love it.</p>
 </div>
 
-<div>
-    <!-- Handle potential null fields safely using Thymeleaf null checks -->
-    <p><strong>Billed To:</strong> <span th:text="${order.customerName != null ? order.customerName : 'N/A'}">Customer</span></p>
-    <p><strong>Invoice ID:</strong> #INV-<span th:text="${order.id}">2</span></p>
-    <p><strong>Status:</strong> <span th:text="${order.status}">PENDING</span></p>
-    <p><strong>Grand Total:</strong> ₹<span th:text="${totalAmount}">0</span></p>
+<div class="details">
+    <p><strong>Billed To:</strong> <span th:text="${order?.customerName != null ? order.customerName : 'N/A'}">Customer</span></p>
+    <p><strong>Invoice ID:</strong> #INV-<span th:text="${order?.id != null ? order.id : '0'}">0</span></p>
+    <p><strong>Status:</strong> <span th:text="${order?.status != null ? order.status : 'PENDING'}">PENDING</span></p>
+    <p><strong>Grand Total:</strong> ₹<span th:text="${totalAmount != null ? totalAmount : 0}">0</span></p>
 </div>
 
 <table>
@@ -30,19 +31,16 @@
     <tr>
         <th>ARTICLE NO</th>
         <th>COLOR</th>
-        <th>SETS/LOOSE</th>
-        <th>PRICE/PC</th>
+        <th>QUANTITY</th>
         <th>TOTAL</th>
     </tr>
     </thead>
     <tbody>
-    <!-- Iterate over order items list -->
     <tr th:each="item : ${items}">
-        <th th:text="${item.articleNo}">ART-101</th>
-        <td th:text="${item.color}">Black</td>
-        <td th:text="${item.quantity}">1 Set</td>
-        <td th:text="${'₹' + item.pricePerPc}">₹500</td>
-        <td th:text="${'₹' + item.totalPrice}">₹500</td>
+        <td th:text="${item?.articleNo != null ? item.articleNo : 'N/A'}">ART-101</td>
+        <td th:text="${item?.color != null ? item.color : 'N/A'}">Black</td>
+        <td th:text="${item?.quantity != null ? item.quantity : 0}">1</td>
+        <td th:text="${item?.totalPrice != null ? '₹' + item.totalPrice : '₹0'}">₹0</td>
     </tr>
     </tbody>
 </table>

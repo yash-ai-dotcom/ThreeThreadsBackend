@@ -7,6 +7,7 @@ import org.thymeleaf.context.Context;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 
 @Service
 public class InvoicePdfService {
@@ -20,10 +21,10 @@ public class InvoicePdfService {
     public byte[] generateOrderInvoicePdf(Order order) throws Exception {
         Context context = new Context();
 
-        // Pass order details to Thymeleaf template using matching entity getters
+        // Pass variables safely with null checks
         context.setVariable("order", order);
-        context.setVariable("items", order.getItems()); // Replaces getOrderItems()
-        context.setVariable("totalAmount", order.getTotalAmount()); // Replaces getGrandTotal()
+        context.setVariable("items", order.getItems() != null ? order.getItems() : Collections.emptyList());
+        context.setVariable("totalAmount", order.getTotalAmount());
 
         String htmlContent = templateEngine.process("invoice-template", context);
 
