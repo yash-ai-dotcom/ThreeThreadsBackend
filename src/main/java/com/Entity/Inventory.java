@@ -42,10 +42,6 @@ public class Inventory {
         return getGrandTotal() * (sellingCostPerPiece != null ? sellingCostPerPiece : 0.0);
     }
 
-    public Double getProfitMargin() {
-        return getSellingTotalCost() - getTotalCost();
-    }
-
     // Standard Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
