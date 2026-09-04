@@ -2,72 +2,50 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <style>
-        @page { size: A4; margin: 15mm 12mm; }
-        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; margin: 0; padding: 0; }
-        .header { background-color: #1a1a1a; color: #ffffff; padding: 24px; border-radius: 6px; }
-        .brand-title { font-size: 24px; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
-        .brand-tagline { font-size: 11px; color: #aaa; margin-top: 4px; }
-
-        .meta-table, .items-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .meta-table td { vertical-align: top; padding: 4px 0; }
-
-        .items-table th { background-color: #f3f4f6; color: #111; text-align: left; padding: 10px; font-size: 11px; text-transform: uppercase; }
-        .items-table td { padding: 10px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
-
-        .totals-section { margin-top: 20px; text-align: right; font-size: 14px; }
-        .total-amount { font-size: 18px; font-weight: bold; color: #111; margin-top: 6px; }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { margin-bottom: 20px; }
+        .company-name { font-size: 24px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="brand-title">Three Threads</div>
-    <div class="brand-tagline">Try it, wear it, love it.</div>
+    <div class="company-name">THREE THREADS</div>
+    <p>Try it, wear it, love it.</p>
 </div>
 
-<table class="meta-table">
-    <tr>
-        <td width="50%">
-            <strong>Billed To:</strong><br/>
-            <span th:text="${customerName}">Customer Name</span><br/>
-            <span th:text="${customerPhone}">Phone Number</span><br/>
-            <span th:text="${shippingAddress}">Address</span>
-        </td>
-        <td width="50%" style="text-align: right;">
-            <strong>Invoice ID:</strong> #INV-<span th:text="${orderId}">1001</span><br/>
-            <strong>Date:</strong> <span th:text="${orderDate}">2026-09-04</span><br/>
-            <strong>Status:</strong> <span th:text="${paymentStatus}">PAID</span>
-        </td>
-    </tr>
-</table>
+<div>
+    <!-- Handle potential null fields safely using Thymeleaf null checks -->
+    <p><strong>Billed To:</strong> <span th:text="${order.customerName != null ? order.customerName : 'N/A'}">Customer</span></p>
+    <p><strong>Invoice ID:</strong> #INV-<span th:text="${order.id}">2</span></p>
+    <p><strong>Status:</strong> <span th:text="${order.status}">PENDING</span></p>
+    <p><strong>Grand Total:</strong> ₹<span th:text="${totalAmount}">0</span></p>
+</div>
 
-<table class="items-table">
+<table>
     <thead>
     <tr>
-        <th>Article No</th>
-        <th>Color</th>
-        <th>Sets / Loose</th>
-        <th>Price / Pc</th>
-        <th style="text-align: right;">Total</th>
+        <th>ARTICLE NO</th>
+        <th>COLOR</th>
+        <th>SETS/LOOSE</th>
+        <th>PRICE/PC</th>
+        <th>TOTAL</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="item : ${orderItems}">
-        <td th:text="${item.articleNo}">TT-101</td>
-        <td th:text="${item.colorName}">Navy</td>
-        <td>
-            <span th:text="${item.setsOrdered} + ' Sets'">1 Set</span>
-            <small th:if="${item.totalPiecesOrdered > 0}" th:text="'(' + ${item.totalPiecesOrdered} + ' loose)'"></small>
-        </td>
-        <td th:text="'₹' + ${item.pricePerPiece}">₹450</td>
-        <td style="text-align: right;" th:text="'₹' + ${item.itemTotal}">₹2,250</td>
+    <!-- Iterate over order items list -->
+    <tr th:each="item : ${items}">
+        <th th:text="${item.articleNo}">ART-101</th>
+        <td th:text="${item.color}">Black</td>
+        <td th:text="${item.quantity}">1 Set</td>
+        <td th:text="${'₹' + item.pricePerPc}">₹500</td>
+        <td th:text="${'₹' + item.totalPrice}">₹500</td>
     </tr>
     </tbody>
 </table>
-
-<div class="totals-section">
-    <div>Grand Total: <span class="total-amount" th:text="'₹' + ${grandTotal}">₹2,250</span></div>
-</div>
 
 </body>
 </html>
